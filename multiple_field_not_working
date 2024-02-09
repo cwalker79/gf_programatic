@@ -1,1 +1,37 @@
+/// >>>>>>> Programatically Add New IPQS Field to Form
+//$new_field_id = GFFormsModel::get_next_field_id( $form['fields'] );
+add_filter( 'gform_form_post_get_meta', 'IPQS_field' );
+function IPQS_field( $form ) {
 
+	$ipqs = GF_Fields::create( array(
+        'type'   => 'text',
+        'id'     => 2023, // The Field ID must be unique on the form
+        'label'  => 'IPQS',
+        'class' => 'hide ipqs',
+    ) );
+	
+	$trusted_form = GF_Fields::create( array(
+        'type'   => 'hidden',
+        'id'     => 2024, // The Field ID must be unique on the form
+        'label'  => 'Trusted Form',
+        'class' => 'hide trusted_form',
+    ) );
+	
+
+	$form['fields'][] = $ipqs;
+	$form['fields'][] = $trusted_form;
+
+	return $form;
+}
+ 
+// Remove the field before the form is saved. Adjust your form ID
+add_filter( 'gform_form_update_meta', 'remove_my_field', 10, 3 );
+function remove_my_field( $form_meta, $form_id, $meta_name ) {
+ 
+    if ( $meta_name == 'display_meta' ) {
+        $form_meta['fields'] = wp_list_filter( $form_meta['fields'], array( 'id' => 2023), 'NOT' );
+		$form_meta['fields'] = wp_list_filter( $form_meta['fields'], array( 'id' => 2024), 'NOT' );
+    }
+ 
+    return $form_meta;
+}
